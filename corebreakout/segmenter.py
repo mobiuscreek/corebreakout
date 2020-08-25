@@ -44,6 +44,7 @@ class CoreSegmenter:
         model_config=defaults.DefaultConfig(),
         class_names=defaults.CLASSES,
         layout_params={},
+        init=None
     ):
         self.model_config = model_config
 
@@ -70,7 +71,17 @@ class CoreSegmenter:
         )
 
         print(f"Loading model weights from file: {str(weights_path)}")
-        self.model.load_weights(str(weights_path), by_name=True)
+        if init == "coco":
+            self.model.load_weights(str(weights_path), by_name=True, 
+                                    exclude=["mrcnn_class_logits",
+                                             "mrcnn_bbox_fc",
+                                             "mrcnn_bbox",
+                                             "mrcnn_mask"])
+        elif init == "imagenet":
+            self.model.load_weights(self.model.get_imagenet_weights(), by_name=True)
+
+        else:
+            self.model.load_weights(str(weights_path), by_name=True)
 
 
     @property
