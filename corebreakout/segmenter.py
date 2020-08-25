@@ -81,8 +81,11 @@ class CoreSegmenter:
             self.model.load_weights(self.model.get_imagenet_weights(), by_name=True)
 
         else:
-            self.model.load_weights(str(weights_path), by_name=True)
-
+            try:
+                self.model.load_weights(str(weights_path), by_name=True)
+            except ValueError as exc:
+                   msg = (f"Error during loading pretrained weights: {exc}")
+                   raise CorebreakoutError(msg) from None
 
     @property
     def layout_params(self):
@@ -346,3 +349,6 @@ class CoreSegmenter:
             raise TypeError(
                 f"`endpts` must be class name, 2-tuple, or 'auto(_all)' not {type(endpts)}"
             )
+
+class CorebreakoutError(Exception):
+    pass
